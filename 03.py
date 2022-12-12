@@ -15,7 +15,7 @@ priorities = 0
 lines = open("03.txt").read().splitlines()
 groups = numpy.array_split(lines, len(lines) / 3)
 for group in groups:
-    a, b, c = set(group[0]), set(group[1]), set(group[2])
+    a, b, c = map(set, group)
     common = set.intersection(a, b, c).pop()
     priorities += letters.index(common) + 1
 
