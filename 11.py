@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 
 class Monkey():
     def __init__(self, items, operation, test, true, false):
@@ -21,13 +22,12 @@ class Monkey():
         false = int(note[5].split(' ')[-1])
         return cls(items, operation, test, true, false)
 
-    def turn(self):
+    def turn(self, relief=None):
         for item in self.items:
-            self.inspect_item(item)
+            self.inspect_item(item, relief)
         self.items = []
 
-    def inspect_item(self, item):
-        print(f'Monkey inspects an item with worry level of {item}')
+    def inspect_item(self, item, relief=None):
         op, val = self.operation.split(' ')
         if val == 'old':
             val = item
@@ -36,27 +36,24 @@ class Monkey():
         match op:
             case '+':
                 item += val
-                print(f'  Worry level increased by {val} to {item}')
             case '*':
                 item *= val
-                print(f'  Worry level is multiplied by {val} to {item}')
 
-        # Relief
-        item = item // 3
-        print(f'  Monkey gets bored with item. Worry level is divided by 3 to {item}.')
+        if relief:
+            item = item // 3
+        else:
+            lcd = math.prod(m.test for m in monkeys)
+            item = item % lcd
 
         # Test
         if item % self.test == 0:
-            print(f'  Current worry level is divisible by {self.test}.')
             self.throw(item, self.true)
         else:
-            print(f'  Current worry level is not divisible by {self.test}.')
             self.throw(item, self.false)
 
         self.inspected += 1
 
     def throw(self, item, monkey_idx):
-        print(f'  Item with worry level {item} is thrown to monkey {monkey_idx}.')
         monkey = monkeys[monkey_idx]
         monkey.items.append(item)
 
@@ -71,9 +68,23 @@ for note in notes:
 
 for round in range(20):
     for i, monkey in enumerate(monkeys):
-        print(i, monkey)
+        monkey.turn(True)
+
+monkeys = sorted(monkeys, key=lambda monkey: monkey.inspected)
+monkey_business = monkeys[-1].inspected * monkeys[-2].inspected
+print(monkey_business)
+
+monkeys = []
+for note in notes:
+    monkeys.append(Monkey.from_note(note))
+
+for round in range(10000):
+    for monkey in monkeys:
         monkey.turn()
-    print(monkeys)
+    if round % 1000 == 0:
+        print(f'\nRound {round}\n')
+        for i, monkey in enumerate(monkeys):
+            print(i, monkey.inspected)
 
 monkeys = sorted(monkeys, key=lambda monkey: monkey.inspected)
 monkey_business = monkeys[-1].inspected * monkeys[-2].inspected
