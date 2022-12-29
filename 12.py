@@ -92,3 +92,11 @@ walk(grid, path)
 
 # Start doesn't count as a step
 print(len(complete_paths[0]) - 1)
+
+# For part 2, we can just look at the input and notice that the only relevant
+# starting points are in the first column, as there are no other 'b's available.
+complete_paths = []
+starting_points = [(i, 0) for i in range(HEIGHT)]
+for point in starting_points:
+    walk(grid, [point])
+print(len(complete_paths[0]) - 1)
