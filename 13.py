@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import functools
 import itertools
 
 pairs = [p.split("\n") for p in open("13.txt").read().strip().split("\n\n")]
@@ -9,12 +10,12 @@ def int_check(a, b):
     """Check for the case where both are integers."""
     if isinstance(a, int) and isinstance(b, int):
         if a < b:
-            return True
+            return -1
         elif a > b:
-            return False
+            return 1
         else:
             # Signal that we need to move on
-            return -1
+            return 0
 
 
 def convert_to_lists(a, b):
@@ -28,20 +29,19 @@ def convert_to_lists(a, b):
 
 
 def compare(left, right):
-    if not left and right:
-        return True
-    if left and not right:
-        return False
-
     int_result = int_check(left, right)
-    if int_result == -1:
+    if int_result == 0:
         return None
     if int_result != None:
         return int_result
 
     left, right = convert_to_lists(left, right)
+    if left == None:
+        return -1
+    if right == None:
+        return 1
+
     for a, b in itertools.zip_longest(left, right):
-        # print(a, b)
         result = compare(a, b)
         if result != None:
             return result
@@ -49,10 +49,19 @@ def compare(left, right):
 
 sum = 0
 for i, pair in enumerate(packets):
-    if compare(pair[0], pair[1]):
+    if compare(pair[0], pair[1]) < 0:
         sum += i + 1
-        print(pair[0], pair[1], "true")
+        # print(pair[0], pair[1], "true")
     else:
-        print(pair[0], pair[1], "false")
-    print()
+        # print(pair[0], pair[1], "false")
+        pass
+    # print()
 print(sum)
+
+# Unzip pairs
+xs, ys = zip(*packets)
+# Inject sentinels
+sorted_packets = sorted([*xs, *ys, [[2]], [[6]]], key=functools.cmp_to_key(compare))
+x = sorted_packets.index([[2]]) + 1
+y = sorted_packets.index([[6]]) + 1
+print(x * y)
